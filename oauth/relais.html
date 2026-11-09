@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="referrer" content="no-referrer">
+  <title>Retour de connexion Meta — Upload Simulator 2027</title>
+  <!--
+    Page relais (plan B Meta) : Facebook renvoie ici (https) après la connexion, et cette page
+    renvoie aussitôt vers le logiciel qui écoute sur http://127.0.0.1:<port>/callback/meta.
+    Le port est lu dans « state » (format « <port>.<nonce> »). Aucun appel réseau, aucun stockage,
+    aucune dépendance externe. Attention : Meta arrive ici par une requête GET dont l'adresse porte le
+    code et le state ; le code transite donc par les journaux du site qui héberge cette page (hébergeur,
+    CDN). Héberge-la sur un service sans journaux d'accès ou purge-les, sers-la si possible avec
+    « Cache-Control: no-store », et préfère le mode loopback (127.0.0.1) quand Meta l'accepte. Un code
+    seul reste inutilisable sans l'app_secret et la même redirect_uri.
+  -->
+  <style>
+    :root {
+      --ocre: #cfa05a; --creme: #f6efe1; --creme-2: #faf2e2; --brun: #3b2a1e;
+      --sarcelle: #2a9d8f; --brique: #d9683a; --gris: #e6e6e6;
+      --ombre: 4px 4px 0 var(--brun); --rayon: 14px;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; min-height: 100%; }
+    body {
+      background: var(--ocre); color: var(--brun);
+      font-family: "Montserrat", "Segoe UI", system-ui, -apple-system, Arial, sans-serif;
+      font-weight: 600; font-size: 16px; line-height: 1.55;
+      display: flex; align-items: center; justify-content: center; padding: 32px 20px;
+    }
+    main {
+      background: var(--creme); border: 2px solid var(--brun); border-radius: var(--rayon);
+      box-shadow: var(--ombre); max-width: 520px; width: 100%; padding: 28px 26px;
+    }
+    h1 { font-size: 1.35rem; margin: 0 0 6px; line-height: 1.25; }
+    .sub { margin: 0 0 18px; font-size: 14px; }
+    p { margin: 0 0 12px; }
+    .pastille { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 8px; vertical-align: middle; background: var(--sarcelle); }
+    .pastille.erreur { background: var(--brique); }
+    .alerte { border-left: 4px solid var(--brique); background: var(--creme-2); padding: 10px 14px; border-radius: 8px; margin: 14px 0; }
+    .alerte.info { border-left-color: var(--sarcelle); }
+    .btn {
+      display: inline-block; margin-top: 8px; padding: 12px 20px; border-radius: 8px;
+      background: var(--sarcelle); color: var(--creme); border: 2px solid var(--brun);
+      box-shadow: 3px 3px 0 var(--brun); font-weight: 800; text-decoration: none; cursor: pointer;
+    }
+    .btn:active { box-shadow: none; transform: translate(3px, 3px); }
+    .btn[hidden] { display: none; }
+    .aide { font-size: 13px; margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--gris); }
+    code { background: var(--creme-2); padding: 1px 6px; border-radius: 4px; font-size: .92em; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Upload Simulator 2027</h1>
+    <p class="sub">Retour de la connexion Meta (Facebook + Instagram)</p>
+
+    <p id="etat"><span class="pastille"></span>Retour vers le logiciel en cours…</p>
+    <div id="message" class="alerte info" hidden></div>
+
+    <a id="secours" class="btn" hidden>Revenir dans le logiciel</a>
+
+    <p class="aide">
+      Si rien ne se passe au bout de quelques secondes, clique sur le bouton ci-dessus.
+      Le logiciel doit être ouvert sur cet ordinateur et attendre la connexion (écran Comptes).
+      Cette page n'enregistre rien et n'envoie rien ailleurs que vers <code>127.0.0.1</code>.
+    </p>
+  </main>
+
+  <script>
+    (function () {
+      "use strict";
+      var etat = document.getElementById("etat");
+      var message = document.getElementById("message");
+      var secours = document.getElementById("secours");
+
+      function montrer(texte, erreur) {
+        message.textContent = texte;
+        message.hidden = false;
+        message.className = erreur ? "alerte" : "alerte info";
+        if (erreur) {
+          etat.innerHTML = '<span class="pastille erreur"></span>Retour impossible.';
+        }
+      }
+
+      function lirePort(state) {
+        // state = "<port>.<nonce>" ; le port doit être un entier entre 1024 et 65535.
+        if (!state) { return null; }
+        var partie = String(state).split(".")[0];
+        if (!/^\d{4,5}$/.test(partie)) { return null; }
+        var port = parseInt(partie, 10);
+        if (port < 1024 || port > 65535) { return null; }
+        return port;
+      }
+
+      var params;
+      try {
+        params = new URLSearchParams(window.location.search);
+      } catch (e) {
+        params = null;
+      }
+      var state = params ? params.get("state") : null;
+      var erreur = params ? params.get("error") : null;
+      var port = lirePort(state);
+
+      if (port === null) {
+        montrer("Lien de retour invalide. Relance la connexion dans Upload Simulator 2027.", true);
+        return;
+      }
+
+      // On renvoie la même query (code, state, error…) au logiciel : il la vérifie lui-même.
+      var cible = "http://127.0.0.1:" + port + "/callback/meta" + window.location.search;
+      secours.href = cible;
+      secours.hidden = false;
+
+      if (erreur) {
+        montrer("La connexion a été refusée ou annulée. Le logiciel va le constater ; tu pourras relancer depuis l'écran Comptes.", false);
+      } else {
+        montrer("Connexion acceptée par Meta. Le logiciel (port " + port + ") termine maintenant tout seul.", false);
+      }
+
+      try {
+        window.location.replace(cible);
+      } catch (e) {
+        montrer("Le navigateur a bloqué le retour automatique : clique sur le bouton.", true);
+      }
+    })();
+  </script>
+</body>
+</html>
