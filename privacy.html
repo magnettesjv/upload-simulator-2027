@@ -13,10 +13,10 @@
 
 <section class="lang" id="fr" lang="fr">
 <h1>Politique de confidentialité</h1>
-<p class="muted">Dernière mise à jour : 6 novembre 2026. Éditeur : Magnettes — <a href="mailto:magnettespro@gmail.com">magnettespro@gmail.com</a>.</p>
+<p class="muted">Dernière mise à jour : 10 novembre 2026. Éditeur : Magnettes — <a href="mailto:magnettespro@gmail.com">magnettespro@gmail.com</a>.</p>
 
 <h2>1. Le principe</h2>
-<p>Upload Simulator 2027 est un logiciel de bureau Windows. Il fonctionne sur ton ordinateur. L'éditeur ne gère aucun serveur qui reçoit tes données : <strong>aucune donnée n'est envoyée à l'éditeur</strong>, et l'éditeur n'a donc accès ni à tes comptes, ni à tes vidéos, ni à tes statistiques.</p>
+<p>Upload Simulator 2027 est un logiciel de bureau Windows. Il fonctionne sur ton ordinateur, et la plupart de tes données y restent. Une seule partie passe par Internet : le <strong>relais en ligne</strong> (section 4), un petit service hébergé chez Cloudflare. Il sert à deux choses : publier tes Reels Instagram programmés même quand ton ordinateur est éteint, et envoyer les DM automatiques. Le relais ne garde que ce qu'il faut pour ces deux fonctions, et pendant une durée limitée.</p>
 
 <h2>2. Données traitées</h2>
 <table>
@@ -25,13 +25,27 @@
 <tr><td>Informations de base de ton profil (nom d'affichage, identifiant, photo) renvoyées par la plateforme</td><td>Afficher quel compte est connecté.</td></tr>
 <tr><td>Tes vidéos, titres, descriptions et la planification (dates et heures)</td><td>Déposer et planifier tes publications.</td></tr>
 <tr><td>Statistiques publiques de tes propres vidéos (vues, mentions j'aime, commentaires, partages, selon la plateforme)</td><td>Te les montrer et les relier à l'heure de publication.</td></tr>
+<tr><td>Si tu allumes les DM automatiques : tes mots-clés et ton message, et, pour chaque nouveau commentaire sous tes posts Instagram, le pseudo et l'identifiant de la personne qui commente, le texte du commentaire et l'heure</td><td>Repérer les commentaires qui contiennent un de tes mots-clés, envoyer ton message en privé à la personne, une seule fois, et te montrer ce qui a été envoyé.</td></tr>
 </table>
-<p>Le logiciel ne collecte pas de données sur d'autres personnes que toi, hormis ce qui apparaît dans les statistiques publiques de tes propres vidéos (par exemple des compteurs).</p>
+<p>Hors des DM automatiques, le logiciel ne collecte pas de données sur d'autres personnes que toi, à part ce qui apparaît dans les statistiques publiques de tes propres vidéos (par exemple des compteurs).</p>
 
 <h2>3. Où sont stockées les données</h2>
-<p>Uniquement sur ton ordinateur, dans le dossier <code>%LOCALAPPDATA%\UploadSimulator2027</code>. Les jetons y sont stockés localement. Tes vidéos et ces données ne sont jamais copiées sur un serveur de l'éditeur. Les envois vers YouTube, TikTok, Instagram et Facebook partent directement de ton ordinateur vers les services de ces plateformes.</p>
+<p>Sur ton ordinateur, dans le dossier <code>%LOCALAPPDATA%\UploadSimulator2027</code>, sauf ce qui est confié au relais en ligne (section 4). Les envois vers YouTube, TikTok et Facebook, et les Reels Instagram publiés tout de suite, partent directement de ton ordinateur vers ces plateformes.</p>
 
-<h2>4. Utilisation des données de chaque plateforme</h2>
+<h2>4. Le relais en ligne (Cloudflare)</h2>
+<p>Le relais est exploité par l'éditeur sur Cloudflare (Workers, base de données D1, stockage R2). Seul le logiciel, avec sa clé d'accès privée, peut le piloter. Il garde :</p>
+<table>
+<tr><th>Donnée</th><th>Combien de temps</th></tr>
+<tr><td>Le jeton d'accès de chaque compte Instagram qui lui confie un Reel ou des DM automatiques, <strong>chiffré</strong> (AES-GCM)</td><td>Tant que le compte utilise le relais, ou jusqu'à ce que tu demandes sa suppression.</td></tr>
+<tr><td>La vidéo d'un Reel programmé</td><td>Jusqu'à sa publication, puis elle est effacée. Si la publication échoue ou est annulée, elle est effacée au plus tard 7 jours après.</td></tr>
+<tr><td>Les informations du Reel programmé (légende, heure, état, lien une fois publié)</td><td>30 jours après la publication, l'échec ou l'annulation.</td></tr>
+<tr><td>Tes règles de DM automatiques (mots-clés, message, marche/arrêt)</td><td>Jusqu'à ce que tu retires la règle.</td></tr>
+<tr><td>Le journal des DM : pour chaque commentaire vu, le pseudo et l'identifiant de la personne, le texte du commentaire (500 caractères au plus), le post concerné, ce que le relais en a fait et l'heure</td><td><strong>90 jours</strong>, puis il est effacé.</td></tr>
+<tr><td>Le nombre de commentaires de chacun de tes 100 derniers posts</td><td>Mis à jour toutes les 2 minutes, pour ne lire que les posts qui ont de nouveaux commentaires.</td></tr>
+</table>
+<p>Cloudflare héberge ces données en tant que prestataire ; sa propre <a href="https://www.cloudflare.com/privacypolicy/" rel="noopener">politique de confidentialité</a> s'applique à son service.</p>
+
+<h2>5. Utilisation des données de chaque plateforme</h2>
 <p>Les données obtenues des plateformes servent uniquement aux fonctions décrites ici, pour ton propre compte. Elles ne sont ni vendues, ni louées, ni partagées avec des tiers, ni utilisées pour de la publicité, du profilage ou l'entraînement de modèles d'intelligence artificielle.</p>
 <h3>TikTok</h3>
 <p>Après ton autorisation via TikTok (Login Kit), le logiciel peut demander ces autorisations (scopes) :</p>
@@ -43,41 +57,40 @@
 </ul>
 <p>Avant chaque publication, le logiciel te montre les réglages et ne publie que ce que tu as demandé. Ces données TikTok restent sur ton ordinateur.</p>
 <h3>YouTube / Google</h3>
-<p>L'utilisation par le logiciel des informations reçues des API Google respecte la <a href="https://developers.google.com/terms/api-services-user-data-policy" rel="noopener">Google API Services User Data Policy</a>, y compris ses exigences d'utilisation limitée (Limited Use). Le logiciel utilise YouTube API Services : en l'utilisant, tu acceptes aussi les <a href="https://www.youtube.com/t/terms" rel="noopener">Conditions d'utilisation de YouTube</a> et la <a href="https://policies.google.com/privacy" rel="noopener">Politique de confidentialité de Google</a>. Tu peux retirer l'accès depuis la page <a href="https://myaccount.google.com/permissions" rel="noopener">myaccount.google.com/permissions</a>.</p>
+<p>L'utilisation par le logiciel des informations reçues des API Google respecte la <a href="https://developers.google.com/terms/api-services-user-data-policy" rel="noopener">Google API Services User Data Policy</a>, y compris ses exigences d'utilisation limitée (Limited Use). Le logiciel utilise YouTube API Services : en l'utilisant, tu acceptes aussi les <a href="https://www.youtube.com/t/terms" rel="noopener">Conditions d'utilisation de YouTube</a> et la <a href="https://policies.google.com/privacy" rel="noopener">Politique de confidentialité de Google</a>. Tu peux retirer l'accès depuis la page <a href="https://myaccount.google.com/permissions" rel="noopener">myaccount.google.com/permissions</a>. Les données Google restent sur ton ordinateur.</p>
 <h3>Instagram et Facebook (Meta)</h3>
-<p>Le logiciel passe par les API officielles de Meta pour publier sur tes pages et comptes professionnels et relever leurs statistiques. Tu peux retirer l'accès depuis les réglages de ton compte Meta (intégrations et applications liées).</p>
+<p>Le logiciel passe par les API officielles de Meta pour publier sur tes comptes professionnels et relever leurs statistiques. Pour les DM automatiques, il utilise les autorisations de gestion des commentaires et des messages : le relais lit les nouveaux commentaires de tes posts et répond en privé, une seule fois, aux commentaires qui contiennent un de tes mots-clés (réponse privée de Meta, possible pendant 7 jours après le commentaire). Il ne lit pas tes autres conversations. Tu peux retirer l'accès depuis les réglages de ton compte Meta (intégrations et applications liées).</p>
 
-<h2>5. Conservation et suppression</h2>
+<h2>6. Conservation et suppression</h2>
 <ul>
-  <li>Les données restent sur ton ordinateur tant que tu ne les supprimes pas.</li>
-  <li><strong>Déconnecter un compte</strong> dans le logiciel efface son jeton de ton ordinateur à ce moment-là.</li>
-  <li>Tu peux supprimer toutes les données en désinstallant le logiciel puis en supprimant le dossier <code>%LOCALAPPDATA%\UploadSimulator2027</code>.</li>
-  <li>Pour couper aussi l'accès côté plateforme, retire l'application dans les réglages de sécurité de ton compte (voir section 4).</li>
-  <li>L'éditeur ne détenant aucune de tes données, il n'a rien à supprimer de son côté. Pour toute question, écris à l'adresse de contact.</li>
+  <li>Les données de ton ordinateur y restent tant que tu ne les supprimes pas. <strong>Déconnecter un compte</strong> dans le logiciel efface son jeton de ton ordinateur à ce moment-là.</li>
+  <li>Tu peux supprimer toutes les données locales en désinstallant le logiciel puis en supprimant le dossier <code>%LOCALAPPDATA%\UploadSimulator2027</code>.</li>
+  <li>Sur le relais, les durées de la section 4 s'appliquent. Retirer une règle de DM l'efface aussitôt. Pour faire effacer plus tôt un jeton ou le journal des DM, écris à l'adresse de contact.</li>
+  <li>Pour couper aussi l'accès côté plateforme, retire l'application dans les réglages de sécurité de ton compte (voir section 5).</li>
 </ul>
 
-<h2>6. Partage avec des tiers</h2>
-<p>Aucune revente, aucun partage, aucun service d'analyse ou de publicité de l'éditeur. Les seuls échanges réseau sont ceux avec les plateformes que tu as connectées, à ta demande, via leurs API officielles ; leurs propres politiques de confidentialité s'appliquent alors à leurs services.</p>
+<h2>7. Partage avec des tiers</h2>
+<p>Aucune revente, aucun partage, aucun service d'analyse ou de publicité. Les seuls échanges réseau sont ceux avec les plateformes que tu as connectées, à ta demande, via leurs API officielles, et avec le relais hébergé chez Cloudflare (section 4). Leurs propres politiques de confidentialité s'appliquent à leurs services.</p>
 
-<h2>7. Sécurité</h2>
-<p>Les jetons sont stockés localement sur ton ordinateur. Sa sécurité (session Windows, antivirus, sauvegardes) reste ta responsabilité. Aucune méthode n'étant parfaite, nous ne pouvons pas garantir une sécurité absolue.</p>
+<h2>8. Sécurité</h2>
+<p>Sur ton ordinateur, les jetons sont stockés localement ; sa sécurité (session Windows, antivirus, sauvegardes) reste ta responsabilité. Sur le relais, les jetons sont chiffrés et l'accès est protégé par une clé privée ; les vidéos ne sont jamais publiques, Instagram les reçoit directement du relais. Aucune méthode n'étant parfaite, nous ne pouvons pas garantir une sécurité absolue.</p>
 
-<h2>8. Enfants</h2>
+<h2>9. Enfants</h2>
 <p>Le logiciel n'est pas destiné aux personnes qui n'ont pas l'âge requis pour utiliser les plateformes connectées.</p>
 
-<h2>9. Tes droits</h2>
-<p>Comme l'éditeur ne détient pas tes données, tu les contrôles directement sur ton ordinateur. Si tu estimes que le droit français et européen (RGPD) te donne un droit à exercer (accès, effacement, etc.), écris à <a href="mailto:magnettespro@gmail.com">magnettespro@gmail.com</a>. Tu peux aussi saisir la CNIL.</p>
+<h2>10. Tes droits, et ceux des personnes qui commentent</h2>
+<p>Tu contrôles directement les données de ton ordinateur. Pour les données du relais, ou si le droit français et européen (RGPD) te donne un droit à exercer (accès, rectification, effacement, opposition), écris à <a href="mailto:magnettespro@gmail.com">magnettespro@gmail.com</a>. Une personne qui a commenté un post et qui veut savoir ce que le journal des DM garde d'elle, ou le faire effacer, peut écrire à la même adresse. Tu peux aussi saisir la CNIL.</p>
 
-<h2>10. Modifications et contact</h2>
+<h2>11. Modifications et contact</h2>
 <p>Cette politique peut évoluer ; la date de mise à jour figure en haut de la page. Contact : Magnettes, <a href="mailto:magnettespro@gmail.com">magnettespro@gmail.com</a>. Droit applicable : droit français.</p>
 </section>
 
 <section class="lang" id="en" lang="en">
 <h1>Privacy Policy</h1>
-<p class="muted">Last updated: November 6, 2026. Publisher: Magnettes — <a href="mailto:magnettespro@gmail.com">magnettespro@gmail.com</a>.</p>
+<p class="muted">Last updated: November 10, 2026. Publisher: Magnettes — <a href="mailto:magnettespro@gmail.com">magnettespro@gmail.com</a>.</p>
 
 <h2>1. Principle</h2>
-<p>Upload Simulator 2027 is a Windows desktop application. It runs on your computer. The publisher operates no server that receives your data: <strong>no data is sent to the publisher</strong>, so the publisher has no access to your accounts, videos or statistics.</p>
+<p>Upload Simulator 2027 is a Windows desktop application. It runs on your computer, and most of your data stays there. Only one part goes through the Internet: the <strong>online relay</strong> (section 4), a small service hosted on Cloudflare. It does two things: publish your scheduled Instagram Reels even when your computer is off, and send automatic DMs. The relay keeps only what these two features need, for a limited time.</p>
 
 <h2>2. Data processed</h2>
 <table>
@@ -86,13 +99,27 @@
 <tr><td>Basic profile information (display name, identifier, avatar) returned by the platform</td><td>Show which account is connected.</td></tr>
 <tr><td>Your videos, titles, descriptions and schedule (dates and times)</td><td>Upload and schedule your posts.</td></tr>
 <tr><td>Public statistics of your own videos (views, likes, comments, shares, depending on the platform)</td><td>Show them to you and link them to publication time.</td></tr>
+<tr><td>If you turn on automatic DMs: your keywords and your message and, for each new comment on your Instagram posts, the commenter's username and identifier, the comment text and its time</td><td>Spot comments that contain one of your keywords, send your message privately to that person, only once, and show you what was sent.</td></tr>
 </table>
-<p>The software does not collect data about people other than you, apart from what appears in the public statistics of your own videos (such as counters).</p>
+<p>Apart from automatic DMs, the software does not collect data about people other than you, except what appears in the public statistics of your own videos (such as counters).</p>
 
 <h2>3. Where data is stored</h2>
-<p>Only on your computer, in the folder <code>%LOCALAPPDATA%\UploadSimulator2027</code>. Tokens are stored locally there. Your videos and this data are never copied to a publisher server. Uploads to YouTube, TikTok, Instagram and Facebook go directly from your computer to those platforms' services.</p>
+<p>On your computer, in the folder <code>%LOCALAPPDATA%\UploadSimulator2027</code>, except what is entrusted to the online relay (section 4). Uploads to YouTube, TikTok and Facebook, and Instagram Reels published right away, go directly from your computer to those platforms.</p>
 
-<h2>4. Use of each platform's data</h2>
+<h2>4. The online relay (Cloudflare)</h2>
+<p>The relay is operated by the publisher on Cloudflare (Workers, D1 database, R2 storage). Only the software, with its private access key, can control it. It keeps:</p>
+<table>
+<tr><th>Data</th><th>How long</th></tr>
+<tr><td>The access token of each Instagram account that entrusts it with a Reel or automatic DMs, <strong>encrypted</strong> (AES-GCM)</td><td>As long as the account uses the relay, or until you ask for its deletion.</td></tr>
+<tr><td>The video of a scheduled Reel</td><td>Until it is published, then it is deleted. If publishing fails or is cancelled, it is deleted within 7 days.</td></tr>
+<tr><td>Scheduled Reel details (caption, time, status, link once published)</td><td>30 days after publication, failure or cancellation.</td></tr>
+<tr><td>Your automatic DM rules (keywords, message, on/off)</td><td>Until you remove the rule.</td></tr>
+<tr><td>The DM log: for each comment seen, the commenter's username and identifier, the comment text (500 characters at most), the post, what the relay did with it, and the time</td><td><strong>90 days</strong>, then it is deleted.</td></tr>
+<tr><td>The comment count of each of your last 100 posts</td><td>Updated every 2 minutes, so that only posts with new comments are read.</td></tr>
+</table>
+<p>Cloudflare hosts this data as a service provider; its own <a href="https://www.cloudflare.com/privacypolicy/" rel="noopener">privacy policy</a> applies to its service.</p>
+
+<h2>5. Use of each platform's data</h2>
 <p>Data obtained from platforms is used only for the features described here, for your own account. It is not sold, rented, shared with third parties, or used for advertising, profiling or training artificial intelligence models.</p>
 <h3>TikTok</h3>
 <p>After your authorization through TikTok (Login Kit), the software may request these scopes:</p>
@@ -104,32 +131,31 @@
 </ul>
 <p>Before each post, the software shows you the settings and only posts what you asked for. This TikTok data stays on your computer.</p>
 <h3>YouTube / Google</h3>
-<p>The software's use of information received from Google APIs adheres to the <a href="https://developers.google.com/terms/api-services-user-data-policy" rel="noopener">Google API Services User Data Policy</a>, including its Limited Use requirements. The software uses YouTube API Services: by using it, you also agree to the <a href="https://www.youtube.com/t/terms" rel="noopener">YouTube Terms of Service</a> and the <a href="https://policies.google.com/privacy" rel="noopener">Google Privacy Policy</a>. You can revoke access at <a href="https://myaccount.google.com/permissions" rel="noopener">myaccount.google.com/permissions</a>.</p>
+<p>The software's use of information received from Google APIs adheres to the <a href="https://developers.google.com/terms/api-services-user-data-policy" rel="noopener">Google API Services User Data Policy</a>, including its Limited Use requirements. The software uses YouTube API Services: by using it, you also agree to the <a href="https://www.youtube.com/t/terms" rel="noopener">YouTube Terms of Service</a> and the <a href="https://policies.google.com/privacy" rel="noopener">Google Privacy Policy</a>. You can revoke access at <a href="https://myaccount.google.com/permissions" rel="noopener">myaccount.google.com/permissions</a>. Google data stays on your computer.</p>
 <h3>Instagram and Facebook (Meta)</h3>
-<p>The software uses Meta's official APIs to post to your pages and professional accounts and to read their statistics. You can revoke access in your Meta account settings (connected apps and integrations).</p>
+<p>The software uses Meta's official APIs to post to your professional accounts and read their statistics. For automatic DMs, it uses the comment and message management permissions: the relay reads new comments on your posts and replies privately, only once, to comments that contain one of your keywords (Meta's private reply, possible for 7 days after the comment). It does not read your other conversations. You can revoke access in your Meta account settings (connected apps and integrations).</p>
 
-<h2>5. Retention and deletion</h2>
+<h2>6. Retention and deletion</h2>
 <ul>
-  <li>Data stays on your computer until you delete it.</li>
-  <li><strong>Disconnecting an account</strong> in the software deletes its token from your computer immediately.</li>
-  <li>You can delete all data by uninstalling the software and deleting the folder <code>%LOCALAPPDATA%\UploadSimulator2027</code>.</li>
-  <li>To also cut access on the platform side, remove the app in your account's security settings (see section 4).</li>
-  <li>Since the publisher holds none of your data, there is nothing to delete on its side. For any question, write to the contact address.</li>
+  <li>Data on your computer stays there until you delete it. <strong>Disconnecting an account</strong> in the software deletes its token from your computer immediately.</li>
+  <li>You can delete all local data by uninstalling the software and deleting the folder <code>%LOCALAPPDATA%\UploadSimulator2027</code>.</li>
+  <li>On the relay, the periods in section 4 apply. Removing a DM rule deletes it immediately. To have a token or the DM log deleted sooner, write to the contact address.</li>
+  <li>To also cut access on the platform side, remove the app in your account's security settings (see section 5).</li>
 </ul>
 
-<h2>6. Sharing with third parties</h2>
-<p>No resale, no sharing, no publisher analytics or advertising service. The only network exchanges are with the platforms you connected, at your request, through their official APIs; their own privacy policies then apply to their services.</p>
+<h2>7. Sharing with third parties</h2>
+<p>No resale, no sharing, no analytics or advertising service. The only network exchanges are with the platforms you connected, at your request, through their official APIs, and with the relay hosted on Cloudflare (section 4). Their own privacy policies apply to their services.</p>
 
-<h2>7. Security</h2>
-<p>Tokens are stored locally on your computer. Its security (Windows account, antivirus, backups) remains your responsibility. No method is perfect, so absolute security cannot be guaranteed.</p>
+<h2>8. Security</h2>
+<p>On your computer, tokens are stored locally; its security (Windows account, antivirus, backups) remains your responsibility. On the relay, tokens are encrypted and access is protected by a private key; videos are never public, Instagram receives them directly from the relay. No method is perfect, so absolute security cannot be guaranteed.</p>
 
-<h2>8. Children</h2>
+<h2>9. Children</h2>
 <p>The software is not intended for people below the minimum age required to use the connected platforms.</p>
 
-<h2>9. Your rights</h2>
-<p>Since the publisher holds none of your data, you control it directly on your computer. If you believe French or EU law (GDPR) gives you a right to exercise (access, erasure, etc.), write to <a href="mailto:magnettespro@gmail.com">magnettespro@gmail.com</a>. You may also contact the CNIL, the French data protection authority.</p>
+<h2>10. Your rights, and those of commenters</h2>
+<p>You control the data on your computer directly. For relay data, or if French or EU law (GDPR) gives you a right to exercise (access, rectification, erasure, objection), write to <a href="mailto:magnettespro@gmail.com">magnettespro@gmail.com</a>. Anyone who commented on a post and wants to know what the DM log keeps about them, or have it deleted, can write to the same address. You may also contact the CNIL, the French data protection authority.</p>
 
-<h2>10. Changes and contact</h2>
+<h2>11. Changes and contact</h2>
 <p>This policy may change; the update date is shown at the top. Contact: Magnettes, <a href="mailto:magnettespro@gmail.com">magnettespro@gmail.com</a>. Governing law: French law.</p>
 </section>
 
